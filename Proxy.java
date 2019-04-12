@@ -27,17 +27,18 @@ public class Proxy implements Interface {
 
    
     @Override
-    public void Realizooperaciones(String usuario, String contraseña) 
+    public void Realizooperaciones(String usuario, String contrasena,String tip) 
     {
          facade = new Facade();
-        if(usu.getLogin().equalsIgnoreCase(usuario) && usu.getPassword().equalsIgnoreCase(contraseña))
+        if(usu.getLogin().equalsIgnoreCase(usuario) && usu.getPassword().equalsIgnoreCase(contrasena))
         {
            
             
-           
-             String tip=null;
+           facade.verificarUsuario(usuario,contrasena);
             
-            if(usu.getTipoUsuario()=="Admin")
+             
+            
+            if(facade.obteterTipo(usuario)=="Admin")
             {
               
                facade.Composite();
@@ -47,12 +48,12 @@ public class Proxy implements Interface {
                facade.Reserva();
                facade.crearUsuario(usuario, contraseña, tip);
             }
-            else if(usu.getTipoUsuario()=="Conductor")
+            else if(facade.obteterTipo(usuario)=="Conductor")
             {
                facade.Composite();
                 facade.Decorator();
                         }
-            else if(usu.getTipoUsuario()=="Pasajero")
+            else if(facade.obteterTipo(usuario)=="Pasajero")
             {
                facade.Reserva();
                 facade.Pago();
