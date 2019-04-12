@@ -15,7 +15,7 @@ import UsuarioAdapter.Usuario;
  */
 public class Proxy implements Interface {
 
-    Fachada1 facate;
+    Facade facade;
     Usuario usu;
     
     public Proxy(Usuario user)
@@ -29,46 +29,45 @@ public class Proxy implements Interface {
     @Override
     public void Realizooperaciones(String usuario, String contraseña) 
     {
-         facate = new Facate();
+         facade = new Facade();
         if(usu.getLogin().equalsIgnoreCase(usuario) && usu.getPassword().equalsIgnoreCase(contraseña))
         {
            
-            facate.
             
+           
+             String tip=null;
             
             if(usu.getTipoUsuario()=="Admin")
             {
-               String tip=null;
-               facate.Composite();
-               facate.Decorator();
-               facate.FlyWeight();
-               facate.Pago();
-               facate.Reserva();
-               facate.crearUsuario(usuario, contraseña, tip);
+              
+               facade.Composite();
+               facade.Decorator();
+               facade.FlyWeight();
+               facade.Pago();
+               facade.Reserva();
+               facade.crearUsuario(usuario, contraseña, tip);
             }
             else if(usu.getTipoUsuario()=="Conductor")
             {
-                facate.Composite();
-                facate.Decorator();
+               facade.Composite();
+                facade.Decorator();
                         }
             else if(usu.getTipoUsuario()=="Pasajero")
             {
-                facate.Reserva();
-                facate.Pago();
+               facade.Reserva();
+                facade.Pago();
                 
             }
         }
         else
         {
             System.out.println("no tiene acceso");
-            String password=null;
-            facate.crearUsuario(usuario, contraseña, password);
+           
+           facade.crearUsuario(usuario, contraseña, tip);
         }
         
     }
 
-    void Realizooperaciones() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
     
 }
