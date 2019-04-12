@@ -11,5 +11,5 @@ package proxy;
  */
 public interface Interface {
     
-   public void Realizooperaciones(String usuario, String contraseña); 
+   public void Realizooperaciones(String usuario, String contrasena, String tip); 
 }
