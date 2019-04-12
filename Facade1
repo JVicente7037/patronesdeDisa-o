@@ -1,0 +1,326 @@
+import java.util.ArrayList;
+
+import adapter.*;
+import Composite.*;
+import Decorate.*;
+import FlyWeight.*;
+import java.util.Hashtable;
+import javax.swing.JOptionPane;
+import proxy.*;
+
+public class Facade1 {
+
+    private static ArrayList<Usuario> usuarios = new ArrayList<Usuario>();
+    private static ArrayList<Ruta> rutas = new ArrayList<Ruta>();
+    private static ArrayList<Reserva> reservas = new ArrayList<Reserva>();
+    private static ArrayList<ComponenteD> pagos = new ArrayList<ComponenteD>();
+    private FlyWeightFactory fabricaUsers = new FlyWeightFactory();
+    ;
+        public static Hashtable<Long, String> aleatorios = new Hashtable<Long, String>();
+    private static Facade1 mFacade;
+
+    public static ArrayList<Usuario> getUsuarios() {
+        return usuarios;
+    }
+
+    public Facade1() {
+    }
+
+    public static Facade1 getInstance() {
+        if (mFacade == null) {
+            mFacade = new Facade1();
+        }
+        return mFacade;
+    }
+
+    public int verificarUsuario(String correo, String pass) {
+        int tipoPasajero = 0;
+        for (Usuario us : usuarios) {
+            if (us.getCorreo().equals(correo) && us.getContrasena().equals(pass)) {
+
+                return obtenerTipo(us);
+            }
+        }
+        return tipoPasajero;
+    }
+
+    private int obtenerTipo(Usuario us) {
+        int tipoUsu = 0;
+        if (us instanceof Pasajero) {
+            tipoUsu = 1;
+        } else if (us instanceof Conductor) {
+            tipoUsu = 2;
+        } else if (us instanceof Administrador) {
+            tipoUsu = 3;
+        
+        return tipoUsu;
+    }
+
+    public Usuario obtenerUsuario(Long aleatorio) {
+        String correo = aleatorios.get(aleatorio);
+        for (Usuario us : usuarios) {
+            if (us.getCorreo().equals(correo)) {
+                return us;
+            }
+        }
+        return null;
+    }
+
+    public String obtenerUsuarios() {
+        String info = "";
+        for (Usuario us : usuarios) {
+            info += us.toString() + "\n";
+        }
+        return info;
+    }
+
+    public void crearRegistroRuta(String nombreRuta, ArrayList<Componente> calles, String documentoConductor) {
+        Ruta ruta = new Ruta(nombreRuta, documentoConductor);
+        ruta.setComponentes(calles);
+        rutas.add(ruta);
+    }
+
+    public String listarRutasConductor(String documento) {
+        String infoRutas = "No se encontraron las rutas para el documento " + documento;
+        String info = "";
+        for (int i = 0; i < rutas.size(); i++) {
+            if (rutas.get(i).getDocumentoConductor().equals(documento)) {
+                info += (i++) + rutas.get(i).obtenerDatos() + "\n\n";
+            }
+        }
+        return (info.isEmpty() ? infoRutas : info);
+    }
+
+    public void actualizarRuta(String nombreRutaModificar, String nombreRutaNuevo, ArrayList<Componente> callesModificadas, String documentoConductor) {
+        int position = 0;
+        for (Ruta ru : rutas) {
+            if (ru.getNombre().equals(nombreRutaModificar)) {
+                Ruta rutaNueva = new Ruta(nombreRutaNuevo, documentoConductor);
+                rutaNueva.setComponentes(callesModificadas);
+                rutas.set(position, rutaNueva);
+            }
+            position++;
+        }
+    }
+
+    public void eliminarRuta(String nombreRuta, String documentoConductor) {
+        System.out.println("antes" + rutas.size());
+        for (Ruta rut : rutas) {
+            if (rut.getNombre().equals(nombreRuta) && rut.getDocumentoConductor().equals(documentoConductor)) {
+                System.out.println(rut);
+                rutas.remove(rut);
+            }
+        }
+        System.out.println("Desoues" + rutas.size());
+
+    }
+
+    public void crearRegistroReserva(String nombreReserva, String nombreRutaReservada, int puestoRutaReservada, String documentoPasajero) {
+        Reserva reserv = new Reserva(nombreReserva, puestoRutaReservada, nombreRutaReservada, documentoPasajero);
+        reservas.add(reserv);
+        System.out.println("Reserva añadida" + reserv.toString());
+    }
+
+    public String listarReservasPasajero(String documentoPasajero) {
+        String lista = "";
+        for (Reserva re : reservas) {
+            if (re.getDocumentoPasajero().equals(documentoPasajero)) {
+                lista += "Nombre reserva: " + re.getNombreReserva()
+                        + "Nombre ruta reservada: " + re.getNombreRutaReservada()
+                        + " \tPuesto reservado: " + re.getPuestoAReservar();
+            }
+        }
+        return lista;
+    }
+
+    public String listarReservasPas(String documentoPasajero) {
+        String lista = "No se encontraron reservas para el pasajero " + documentoPasajero;
+        String infoRes = "";
+        for (int i = 0; i < reservas.size(); i++) {
+            if (reservas.get(i).getDocumentoPasajero().equals(documentoPasajero)) {
+                infoRes += (i++) + reservas.get(i).toString() + "\n";
+            }
+        }  
+        return (infoRes.isEmpty() ? lista : infoRes);
+    }
+
+    public void modificarReservaPasajero(String nombreReservaModificar, String nombreRutaReservadaModificado,
+            int puestoRutaReservadaModificado, String documentoPasajero) {
+
+        for (Reserva res : reservas) {
+
+            if (res.getNombreReserva().equals(nombreReservaModificar) && res.getDocumentoPasajero().equals(documentoPasajero)) {
+                System.out.println("Antes de modificar " + res.toString());
+                res.setNombreRutaReservada((nombreRutaReservadaModificado.isEmpty() ? res.getNombreRutaReservada() : nombreRutaReservadaModificado));
+                res.setPuestoAReservar(puestoRutaReservadaModificado);
+
+                System.out.println("nueva" + res.toString());
+            }
+        }
+
+    }
+
+    public void eliminarReserva(String nombreReservaEliminar, String documentoPasajero) {
+        for (Reserva re : reservas) {
+            if (re.getDocumentoPasajero().equals(documentoPasajero) && re.getNombreReserva() == nombreReservaEliminar) {
+                reservas.remove(re);
+                break;
+            }
+        }
+    }
+
+    public void registrarPasajero(String nombre, String documento, String correo, String contrasena) {
+        Pasajero pasa = new Pasajero(nombre, correo, contrasena, documento);
+        usuarios.add(pasa);
+        fabricaUsers.añadirUsuario(pasa);
+
+    }
+
+    public void modificarPasajero(String nombre, String documento, String correo, String contrasena) {
+        int position = 0;
+        for (Usuario us : usuarios) {
+            if (us.getDocumento().equals(documento)) {
+                usuarios.set(position, new Pasajero(nombre, correo, contrasena, documento));
+            }
+            position++;
+        }
+    }
+
+    public void eliminarUsuario(String documento) {
+        for (Usuario us : usuarios) {
+            if (us.getDocumento().equals(documento)) {
+                System.out.println("Antes " + usuarios.size());
+                usuarios.remove(us);
+                fabricaUsers.eliminarUs(documento);
+                System.out.println("Despues " + usuarios.size());
+                break;
+            }
+        }
+    }
+
+    public void registrarConductor(String nombre, String documento, String correo, String contrasena) {
+        Conductor cond = new Conductor(nombre, correo, contrasena, documento);
+        fabricaUsers.añadirUsuario(cond);
+        usuarios.add(cond);
+
+    }
+
+    public void modificarConductor(String nombre, String documento, String correo, String contrasena) {
+        int position = 0;
+        for (Usuario us : usuarios) {
+            if (us.getDocumento().equals(documento)) {
+                usuarios.set(position, new Conductor(nombre, correo, contrasena, documento));
+            }
+            position++;
+        }
+    }
+
+    public void registrarAdministrador(String nombre, String documento, String correo, String contrasena) {
+        AdministradorAdapter admin = new AdministradorAdapter(nombre, correo, contrasena, documento);
+        fabricaUsers.añadirUsuario(admin);
+        usuarios.add(admin);
+    }
+
+    public void modificarAdministrador(String nombre, String documento, String correo, String contrasena) {
+        int position = 0;
+        for (Usuario us : usuarios) {
+            if (us.getDocumento().equals(documento)) {
+                usuarios.set(position, new AdministradorAdapter(nombre, correo, contrasena, documento));
+            }
+            position++;
+        }
+    }
+
+    public void registrarPago(String parametros) {
+        ComponenteD component = new PagoPSEBanco(new Pago());
+        component.establecerParametros(parametros);
+        pagos.add(component);
+    }
+
+    public void registrarPagoTarjeta(String parametros) {
+        ComponenteD component = new PagoPSETarjeta(new Pago());
+        component.establecerParametros(parametros);
+        pagos.add(component);
+    }
+
+    public String obtenerPagos() {
+        String valoresPagos = "";
+        for (ComponenteD pago : pagos) {
+            valoresPagos += pago.obtenerParametros() + "\n";
+        }
+        return valoresPagos;
+    }
+
+    public void usuariosPrueba() {
+        usuarios.add(new Conductor("Lopez", "lopez@unisabana.edu.co", "l123", "102347"));
+        usuarios.add(new Conductor("Santos", "santos@unisabana.edu.co", "s123", "10423829"));
+        usuarios.add(new Pasajero("Garcia", "garcia@unisabana.edu.co", "a123", "124327889"));
+        usuarios.add(new Pasajero(" Correa", "correa@unisabana.edu.co", "c123", "2132182"));
+        usuarios.add(new AdministradorAdapter("Jimenez", "jimenez@unisabana.edu.co", "j123", "10976678"));
+    }
+
+    public void rutasPrueba() {
+        TransporteIndividual c1 = new TransporteIndividual("Local" , "WER345" ,"48", "Mazda", "1998", "XXX");
+        TransporteIndividual c2 = new TransporteIndividual("Lowe" ,  "WAS345" ,"22", "Mazda", "1998", "XXX");
+        TransporteIndividual c3 = new TransporteIndividual("Mai" , "RPÑ125" ,"54", "Hyundai", "2000", "LKS");
+        TransporteIndividual c4 = new TransporteIndividual("Territorial" , "PLO134" ,"26", "Volkswagen", "1990", "LKS");
+        TransporteIndividual c5 = new TransporteIndividual("Cal" , "AWE562" ,"30", "Mercedes", "1934", "LKS");
+        TransporteIndividual c6 = new TransporteIndividual("XS" , "APD345" ,"60", "Volkswagen", "2010", "LKS");
+      
+        MediosTransporte a = new MediosTransporte("Bus");
+        MediosTransporte b = new MediosTransporte("Buseta");
+        MediosTransporte c = new MediosTransporte("Flota");
+        MediosTransporte d = new MediosTransporte("Chiva");
+        //Vehiculos en Bus
+        a.add(c1);
+        a.add(c4);
+        a.add(c2);
+        //Flota y Buseta en un grupo de Bus (Tipo de bus)
+        c.add(a);
+        c.add(b);
+       // System.out.println(c.obtenerDatos(String tipo));
+
+        //Vehiculos de Buseta
+        b.add(c5);
+        b.add(c3);
+        //System.out.println(b.obtenerDatos(String tipo));
+
+        //Vehiculos de Chiva
+        d.add(c6);
+    }
+
+    public void reservasPrueba() {
+
+        reservas.add(new Reserva("Reserva 124738", 1, "Ruta 1", "1234567889"));
+
+        reservas.add(new Reserva("Reserva 5243446", 3, "Ruta 3", "216654382"));
+    }
+
+    public String MenuPasajero() {
+
+        int opcion = 0;
+
+        return "" + "1. Crear registro de reserva \n" + "2. Listar reservas \n"
+                + "3. Modificar reserva \n" + "4. Eliminar reserva \n" + "0. salir \n";
+
+    }
+
+    public String MenuConductor() {
+
+        //int opcion = 0;
+        return "" + "1. Crear ruta \n" + "2. Listar rutas \n"
+                + "3. Modificar ruta \n" + "4. Eliminar ruta \n" + "0. Salir \n";
+
+    }
+
+    public Long Operacion(String correo, String password) {
+        Long aleatorio = Long.parseLong(String.valueOf(Math.random() * 2E13 + 1));
+        aleatorios.put(aleatorio, correo);
+        return aleatorio;
+    }
+
+    public boolean isSession(Long keyLogin) {
+        return aleatorios.contains(keyLogin) && keyLogin != 0 ? true : false;
+    }
+
+}
