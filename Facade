@@ -258,6 +258,12 @@ public class Facade1 {
         usuarios.add(new Pasajero(" Correa", "correa@unisabana.edu.co", "c123", "2132182"));
         usuarios.add(new AdministradorAdapter("Jimenez", "jimenez@unisabana.edu.co", "j123", "10976678"));
     }
+    	public void PagosDummy(){
+		CambioInt m1= FactoriaPagos.crearPago(1,1200,"Debitar");
+        CambioInt m2= FactoriaPagos.crearPago(2,3,"Creditar");
+        CambioInt m3= FactoriaPagos.crearPago(3,1200,"Debitar");
+        CambioInt m4= FactoriaPagos.crearPago(4,1200,"Creditar");
+	}
 
     public void rutasPrueba() {
         TransporteIndividual c1 = new TransporteIndividual("Local" , "WER345" ,"48", "Mazda", "1998", "XXX");
